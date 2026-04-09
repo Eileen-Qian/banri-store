@@ -13,7 +13,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
-      <body>{children}</body>
+      <body className="d-flex flex-column min-vh-100">
+        {children}
+      </body>
     </html>
   );
 }
