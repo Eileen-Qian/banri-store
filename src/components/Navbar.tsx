@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import logo from "@/app/BanriLogo 1.svg";
 import LanguageSwitcher from "./LanguageSwitcher";
+import DarkModeToggle from "./DarkModeToggle";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,8 +17,12 @@ export default function Navbar() {
   const closeMenu = () => setIsOpen(false);
 
   useEffect(() => {
-    closeMenu();
-    window.scrollTo(0, 0);
+    // Defer to avoid sync setState-in-effect lint rule
+    const id = requestAnimationFrame(() => {
+      setIsOpen(false);
+      window.scrollTo(0, 0);
+    });
+    return () => cancelAnimationFrame(id);
   }, [pathname]);
 
   useEffect(() => {
@@ -27,13 +32,16 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className={`navbar navbar-expand-lg bg-body-tertiary fixed-top${scrolled ? " shadow-sm" : ""}`}>
+    <nav
+      className={`navbar navbar-expand-lg bg-body-tertiary fixed-top${scrolled ? " shadow-sm" : ""}`}
+    >
       <div className="container-fluid">
         <Link className="navbar-brand" href="/" onClick={closeMenu}>
           <Image src={logo} alt="Banri" height={60} priority />
         </Link>
 
-        <div className="d-lg-none ms-auto me-2">
+        <div className="d-lg-none ms-auto me-2 d-flex align-items-center gap-1">
+          <DarkModeToggle />
           <LanguageSwitcher />
         </div>
 
@@ -65,12 +73,17 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" href="/order-status" onClick={closeMenu}>
+              <Link
+                className="nav-link"
+                href="/order-status"
+                onClick={closeMenu}
+              >
                 {t("nav.orderStatus")}
               </Link>
             </li>
           </ul>
-          <div className="d-none d-lg-flex">
+          <div className="d-none d-lg-flex align-items-center gap-1">
+            <DarkModeToggle />
             <LanguageSwitcher />
           </div>
         </div>
