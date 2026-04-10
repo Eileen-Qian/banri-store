@@ -188,10 +188,13 @@ export default function CheckOutPage() {
     defaultValues: savedForm ?? defaultForm,
   });
 
-  // Persist form data on every change
+  // Persist form data on every change (skip after order placed)
+  const orderPlacedRef = useRef(false);
   const formValues = watch();
   useEffect(() => {
-    sessionStorage.setItem(FORM_KEY, JSON.stringify(formValues));
+    if (!orderPlacedRef.current) {
+      sessionStorage.setItem(FORM_KEY, JSON.stringify(formValues));
+    }
   }, [formValues]);
 
   const selectedCity = watch("city");
@@ -316,6 +319,7 @@ export default function CheckOutPage() {
         })
         .json();
       clearCartToken();
+      orderPlacedRef.current = true;
       sessionStorage.removeItem(FORM_KEY);
 
       // Store order data in sessionStorage for the success page
