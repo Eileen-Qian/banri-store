@@ -159,6 +159,24 @@ export default function CheckOutPage() {
       .catch(console.error);
   }, []);
 
+  // Restore form data from sessionStorage (survives language switch)
+  const FORM_KEY = "banri-checkout-form";
+  const defaultForm = {
+    email: "",
+    name: "",
+    tel: "",
+    city: "",
+    district: "",
+    address: "",
+    storeBrand: "",
+    storeName: "",
+    storeNumber: "",
+    message: "",
+  };
+  const savedForm: typeof defaultForm | null = typeof window !== "undefined"
+    ? JSON.parse(sessionStorage.getItem(FORM_KEY) || "null")
+    : null;
+
   const {
     register,
     handleSubmit,
@@ -167,19 +185,14 @@ export default function CheckOutPage() {
     formState: { errors },
   } = useForm({
     mode: "onChange",
-    defaultValues: {
-      email: "",
-      name: "",
-      tel: "",
-      city: "",
-      district: "",
-      address: "",
-      storeBrand: "",
-      storeName: "",
-      storeNumber: "",
-      message: "",
-    },
+    defaultValues: savedForm ?? defaultForm,
   });
+
+  // Persist form data on every change
+  const formValues = watch();
+  useEffect(() => {
+    sessionStorage.setItem(FORM_KEY, JSON.stringify(formValues));
+  }, [formValues]);
 
   const selectedCity = watch("city");
   const needsAddress = NEEDS_ADDRESS.includes(selectedMethod);
@@ -302,6 +315,7 @@ export default function CheckOutPage() {
         })
         .json();
       clearCartToken();
+      sessionStorage.removeItem(FORM_KEY);
 
       // Store order data in sessionStorage for the success page
       const orderData = {
