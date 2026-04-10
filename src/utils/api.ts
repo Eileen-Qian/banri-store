@@ -78,9 +78,20 @@ interface LocalizedField {
 /**
  * Extract the localized string from a JSON field like { zh, en }.
  */
-export function localizedName(field: LocalizedField | null | undefined, lang = "zh-TW") {
+/**
+ * Auto-detect locale from URL path when no lang is provided.
+ */
+function detectLang(): string {
+  if (typeof window !== "undefined") {
+    return window.location.pathname.startsWith("/en") ? "en" : "zh";
+  }
+  return "zh";
+}
+
+export function localizedName(field: LocalizedField | null | undefined, lang?: string) {
   if (!field) return "";
-  if (lang === "zh-TW" || lang === "zh" || lang.startsWith("zh")) {
+  const l = lang || detectLang();
+  if (l === "zh-TW" || l === "zh" || l.startsWith("zh")) {
     return field.zh || field.en || "";
   }
   return field.en || field.zh || "";
