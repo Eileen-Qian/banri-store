@@ -105,3 +105,12 @@ export function priceRange(variants: { price: string | number }[]) {
   const prices = variants.map((v) => Number(v.price));
   return { min: Math.min(...prices), max: Math.max(...prices) };
 }
+
+/**
+ * Append ImageKit transformation parameters to a URL.
+ */
+export function ikTransform(url: string, transforms: string) {
+  if (!url || !transforms) return url;
+  const sep = url.includes("?") ? "," : "?tr=";
+  return `${url}${sep}${transforms}`;
+}

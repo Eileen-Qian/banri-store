@@ -1,0 +1,36 @@
+// ── Dark mode overrides ───────────────────────────────────────────────────────
+
+[data-bs-theme="dark"] {
+  .navbar .nav-link.active {
+    color: #9DB38A !important;
+  }
+
+  .navbar.shadow-sm {
+    background-color: rgba(22, 24, 27, 0.78) !important;
+    box-shadow: 0 1px 20px rgba(0, 0, 0, 0.35) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .btn-outline-primary {
+    --bs-btn-color: #9DB38A;
+    --bs-btn-border-color: #9DB38A;
+    --bs-btn-hover-bg: #9DB38A;
+    --bs-btn-hover-border-color: #9DB38A;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #8FA47A;
+    --bs-btn-active-border-color: #8FA47A;
+    --bs-btn-active-color: #fff;
+  }
+
+  .btn-primary {
+    --bs-btn-bg: #8FA47A;
+    --bs-btn-border-color: #8FA47A;
+    --bs-btn-color: #fff;
+    --bs-btn-hover-bg: #9DB38A;
+    --bs-btn-hover-border-color: #9DB38A;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #829872;
+    --bs-btn-active-border-color: #829872;
+    --bs-btn-active-color: #fff;
+  }
+}

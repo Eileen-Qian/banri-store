@@ -1,7 +1,22 @@
+@import "bootstrap/scss/functions";
+@import "../styles/variables";
 @import "bootstrap/scss/bootstrap";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
+// ── Partials ─────────────────────────────────────────────────────────────────
+@import "../styles/navbar";
+@import "../styles/dark-mode";
+@import "../styles/not-found";
+@import "../styles/home";
+@import "../styles/products";
+
+// ── Global base ──────────────────────────────────────────────────────────────
 html,
 body {
   height: 100%;
+  text-align: center;
+}
+
+img {
+  max-width: 100%;
 }
