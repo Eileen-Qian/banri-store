@@ -310,6 +310,7 @@ export default function CheckOutPage() {
             storeName: formData.storeName || undefined,
             storeNumber: formData.storeNumber || undefined,
             message: formData.message || undefined,
+            locale,
           },
           headers: cartHeaders(),
         })
