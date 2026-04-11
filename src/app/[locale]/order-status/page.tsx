@@ -9,7 +9,6 @@ import { api, localizedName } from "@/utils/api";
 import { currency } from "@/utils/currency";
 import { emailValidation } from "@/utils/validation";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 function paymentStatus(order: any) {
   if (order.isPaid) return { key: "statusPaid", badge: "bg-success" };
@@ -516,4 +515,3 @@ function OrderDetail({
     </>
   );
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

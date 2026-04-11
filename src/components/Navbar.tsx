@@ -19,7 +19,10 @@ export default function Navbar() {
   useEffect(() => {
     const id = requestAnimationFrame(() => {
       setIsOpen(false);
-      window.scrollTo(0, 0);
+      // Skip scroll-to-top when restoring scroll after language switch
+      if (!(window as any).__banriRestoreScroll) {
+        window.scrollTo(0, 0);
+      }
     });
     return () => cancelAnimationFrame(id);
   }, [pathname]);

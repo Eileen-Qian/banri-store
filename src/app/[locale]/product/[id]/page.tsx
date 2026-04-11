@@ -13,7 +13,6 @@ import {
 import { currency } from "@/utils/currency";
 import { useMessage } from "@/hooks/useMessage";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default function SingleProductPage() {
   const [product, setProduct] = useState<any>(null);
@@ -227,4 +226,3 @@ export default function SingleProductPage() {
     </div>
   );
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

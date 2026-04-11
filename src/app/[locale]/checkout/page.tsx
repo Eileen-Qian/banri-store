@@ -27,7 +27,6 @@ import {
   addressValidation,
 } from "@/utils/validation";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 const NEEDS_ADDRESS = ["delivery-private_delivery"];
 const NEEDS_DISTRICT = ["delivery-private_delivery"];
@@ -744,4 +743,3 @@ export default function CheckOutPage() {
     </div>
   );
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

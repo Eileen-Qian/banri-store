@@ -5,7 +5,6 @@ import { useTranslations, useLocale } from "next-intl";
 import { api, localizedName } from "@/utils/api";
 import { currency } from "@/utils/currency";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default function ShippingPage() {
   const t = useTranslations();
@@ -152,4 +151,3 @@ export default function ShippingPage() {
     </div>
   );
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

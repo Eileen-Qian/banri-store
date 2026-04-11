@@ -7,7 +7,6 @@ import { api, localizedName, primaryImageUrl, cartHeaders } from "@/utils/api";
 import { currency } from "@/utils/currency";
 import { useMessage } from "@/hooks/useMessage";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default function CartPage() {
   const t = useTranslations();
@@ -306,4 +305,3 @@ export default function CartPage() {
     </div>
   );
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ScrollRestore from "@/components/ScrollRestore";
 
 export default async function LocaleLayout({
   children,
@@ -23,6 +24,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
+      <ScrollRestore />
       <Navbar />
       <main style={{ paddingTop: 100 }} className="flex-grow-1">
         {children}

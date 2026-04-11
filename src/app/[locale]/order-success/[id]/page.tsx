@@ -8,7 +8,6 @@ import { api, localizedName } from "@/utils/api";
 import { currency } from "@/utils/currency";
 import { getLineLoginUrl, exchangeLineCode } from "@/utils/lineLogin";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default function OrderSuccessPage() {
   const params = useParams<{ id: string }>();
@@ -26,7 +25,10 @@ export default function OrderSuccessPage() {
   });
   const [loading, setLoading] = useState(!order);
   const [error, setError] = useState("");
-  const [lineLinked, setLineLinked] = useState(false);
+  const [lineLinked, setLineLinked] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(`banri-line-linked-${params.id}`) === "1";
+  });
   const [linkingLine, setLinkingLine] = useState(false);
 
   useEffect(() => {
@@ -57,6 +59,7 @@ export default function OrderSuccessPage() {
           json: { customerId: data.customerId },
         });
         setLineLinked(true);
+        localStorage.setItem(`banri-line-linked-${params.id}`, "1");
       })
       .catch(() => {
         // silent — LINE linking is optional
@@ -115,15 +118,7 @@ export default function OrderSuccessPage() {
         <div className="col-md-8 col-lg-6">
           <div className="card border-0 shadow-sm mb-4">
             <div className="card-body p-4">
-              <div className="d-flex justify-content-between align-items-start mb-3">
-                <div>
-                  <small className="text-muted">
-                    {t("orderSuccess.orderId")}
-                  </small>
-                  <div className="fw-bold">
-                    {order.orderNumber || order.id}
-                  </div>
-                </div>
+              <div className="text-end mb-3">
                 <span
                   className={`badge ${order.isPaid ? "bg-success" : "bg-secondary"}`}
                 >
@@ -133,34 +128,42 @@ export default function OrderSuccessPage() {
                 </span>
               </div>
 
-              <div className="row g-3 mb-3">
-                <div className="col-6">
-                  <small className="text-muted">
-                    {t("orderSuccess.recipient")}
-                  </small>
-                  <div>{order.name}</div>
-                </div>
-                <div className="col-6">
-                  <small className="text-muted">
-                    {t("orderSuccess.deliveryMethod")}
-                  </small>
-                  <div>{methodName}</div>
+              <div className="mb-2">
+                <small className="text-muted">
+                  {t("orderSuccess.orderId")}
+                </small>
+                <div className="fw-bold">
+                  {order.orderNumber || order.id}
                 </div>
               </div>
 
+              <div className="mb-2">
+                <small className="text-muted">
+                  {t("orderSuccess.recipient")}
+                </small>
+                <div>{order.name}</div>
+              </div>
+
+              <div className="mb-2">
+                <small className="text-muted">
+                  {t("orderSuccess.deliveryMethod")}
+                </small>
+                <div>{methodName}</div>
+              </div>
+
               {order.city && (
-                <div className="mb-3">
+                <div className="mb-2">
                   <small className="text-muted">
                     {t("orderSuccess.deliveryAddress")}
                   </small>
                   <div>
-                    {order.city}
-                    {order.district} {order.address}
+                    {order.city}{order.district}{order.address ? ` ${order.address}` : ""}
                   </div>
                 </div>
               )}
+
               {order.storeName && (
-                <div className="mb-3">
+                <div className="mb-2">
                   <small className="text-muted">
                     {t("orderSuccess.pickupStore")}
                   </small>
@@ -277,4 +280,3 @@ export default function OrderSuccessPage() {
     </div>
   );
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

@@ -211,7 +211,6 @@ function SubscriptionSection() {
 }
 
 // ── Featured Products ──
-/* eslint-disable @typescript-eslint/no-explicit-any */
 function FeaturedSection() {
   const t = useTranslations();
   const router = useRouter();
@@ -295,7 +294,6 @@ function FeaturedSection() {
     </section>
   );
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 // ── Contact ──
 const MAP_SRC_BASE =

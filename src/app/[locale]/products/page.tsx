@@ -13,7 +13,6 @@ import {
 import { currency } from "@/utils/currency";
 import Pagination from "@/components/Pagination";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 function ProductSkeleton() {
   return (
@@ -179,4 +178,3 @@ export default function ProductsPage() {
     </div>
   );
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
