@@ -52,7 +52,7 @@ export default function SingleProductPage() {
 
   if (!product) {
     return (
-      <div className="container mt-5" aria-hidden="true">
+      <div className="container mt-5 mb-3" aria-hidden="true">
         <div className="row">
           <div className="col-md-6">
             <div
@@ -99,7 +99,7 @@ export default function SingleProductPage() {
   const range = priceRange(product.variants);
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5 mb-3">
       <div className="row">
         <div className="col-md-6">
           {mainImage && (
