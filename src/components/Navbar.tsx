@@ -17,7 +17,6 @@ export default function Navbar() {
   const closeMenu = () => setIsOpen(false);
 
   useEffect(() => {
-    // Defer to avoid sync setState-in-effect lint rule
     const id = requestAnimationFrame(() => {
       setIsOpen(false);
       window.scrollTo(0, 0);

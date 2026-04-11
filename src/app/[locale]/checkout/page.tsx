@@ -227,10 +227,12 @@ export default function CheckOutPage() {
     return typeof cityObj === "string" ? cityObj : cityObj.zh;
   };
 
-  // Restore saved city
-  const savedCityRef = useRef(getSavedCity());
-  const savedDistrictRef = useRef(getSavedDistrict());
+  // Restore saved city — prefer sessionStorage form, fall back to localStorage
+  const savedCityRef = useRef(savedForm?.city || getSavedCity());
+  const savedDistrictRef = useRef(savedForm?.district || getSavedDistrict());
   const prevCityRef = useRef("");
+
+
 
   useEffect(() => {
     const city = savedCityRef.current;
@@ -277,12 +279,11 @@ export default function CheckOutPage() {
     saveDeliveryAddress(selectedCity, "");
   }, [selectedCity, setValue]);
 
-  const methodInitRef = useRef(true);
+  // Clear address/store fields only when delivery method actually changes
+  const prevMethodRef = useRef(selectedMethod);
   useEffect(() => {
-    if (methodInitRef.current) {
-      methodInitRef.current = false;
-      return;
-    }
+    if (prevMethodRef.current === selectedMethod) return;
+    prevMethodRef.current = selectedMethod;
     setValue("city", "");
     setValue("district", "");
     saveDeliveryAddress("", "");
@@ -321,6 +322,8 @@ export default function CheckOutPage() {
       clearCartToken();
       orderPlacedRef.current = true;
       sessionStorage.removeItem(FORM_KEY);
+      saveDeliveryMethod("");
+      saveDeliveryAddress("", "");
 
       // Store order data in sessionStorage for the success page
       const orderData = {

@@ -2,7 +2,8 @@
 
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { useRouter } from "@/i18n/navigation";
+import { useRouter as useNextRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 
 /**
  * LINE Login redirects here with ?code=xxx&state=orderId.
@@ -10,7 +11,8 @@ import { useRouter } from "@/i18n/navigation";
  */
 export default function LineCallbackPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useNextRouter();
+  const locale = useLocale();
 
   useEffect(() => {
     const code = searchParams.get("code");
@@ -19,11 +21,11 @@ export default function LineCallbackPage() {
     if (code && orderId) {
       sessionStorage.setItem("lineCallbackCode", code);
       sessionStorage.setItem("lineCallbackOrderId", orderId);
-      router.replace(`/order-success/${orderId}`);
+      router.replace(`/${locale}/order-success/${orderId}`, { scroll: false });
     } else {
-      router.replace("/");
+      router.replace(`/${locale}`);
     }
-  }, [searchParams, router]);
+  }, [searchParams, router, locale]);
 
   return (
     <div className="container py-5 text-center">

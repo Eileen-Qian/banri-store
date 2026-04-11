@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -40,12 +40,14 @@ export default function OrderSuccessPage() {
   }, [params.id, order]);
 
   // LINE Login callback — run once on mount
+  const fromLineLogin = useRef(false);
   useEffect(() => {
     const code = sessionStorage.getItem("lineCallbackCode");
     const orderId = sessionStorage.getItem("lineCallbackOrderId");
     if (!code || !orderId || orderId !== params.id) return;
     sessionStorage.removeItem("lineCallbackCode");
     sessionStorage.removeItem("lineCallbackOrderId");
+    fromLineLogin.current = true;
 
     // Start linking — defer setState to satisfy react-hooks/set-state-in-effect
     queueMicrotask(() => setLinkingLine(true));
@@ -61,6 +63,16 @@ export default function OrderSuccessPage() {
       })
       .finally(() => setLinkingLine(false));
   }, [params.id]);
+
+  // Scroll to LINE section when returning from LINE Login
+  useEffect(() => {
+    if (!fromLineLogin.current || loading) return;
+    const timer = setTimeout(() => {
+      const el = document.getElementById("line-section");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   if (loading) {
     return <p className="text-center fs-2 mt-5">{t("common.loading")}</p>;
@@ -222,6 +234,7 @@ export default function OrderSuccessPage() {
 
           {!order.customerId && (
             <div
+              id="line-section"
               className="card border-0 shadow-sm mb-4"
               style={{ background: "#eafbea" }}
             >

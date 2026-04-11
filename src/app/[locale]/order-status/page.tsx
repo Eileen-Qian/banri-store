@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { api, localizedName } from "@/utils/api";
 import { currency } from "@/utils/currency";
@@ -17,12 +18,26 @@ function paymentStatus(order: any) {
   return { key: "statusPending", badge: "bg-secondary" };
 }
 
+const STATUS_KEY = "banri-order-status";
+
 export default function OrderStatusPage() {
   const t = useTranslations();
-  const [orders, setOrders] = useState<any[] | null>(null);
-  const [singleOrder, setSingleOrder] = useState<any>(null);
+  const searchParams = useSearchParams();
+
+  // Restore state from sessionStorage (survives language switch)
+  const saved = typeof window !== "undefined"
+    ? JSON.parse(sessionStorage.getItem(STATUS_KEY) || "null")
+    : null;
+
+  const [orders, setOrders] = useState<any[] | null>(saved?.orders ?? null);
+  const [singleOrder, setSingleOrder] = useState<any>(saved?.singleOrder ?? null);
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
+
+  const defaultForm: { email: string; orderId: string } = {
+    email: saved?.email || "",
+    orderId: searchParams.get("orderNumber") || saved?.orderId || "",
+  };
 
   const {
     register,
@@ -31,7 +46,7 @@ export default function OrderStatusPage() {
     formState: { errors },
   } = useForm({
     mode: "onSubmit",
-    defaultValues: { email: "", orderId: "" },
+    defaultValues: defaultForm,
   });
 
   const onSubmit = async (data: any) => {
@@ -48,8 +63,20 @@ export default function OrderStatusPage() {
 
       if (res.type === "single") {
         setSingleOrder(res.order);
+        sessionStorage.setItem(STATUS_KEY, JSON.stringify({
+          email: data.email.trim(),
+          orderId: data.orderId.trim(),
+          singleOrder: res.order,
+          orders: null,
+        }));
       } else {
         setOrders(res.orders);
+        sessionStorage.setItem(STATUS_KEY, JSON.stringify({
+          email: data.email.trim(),
+          orderId: data.orderId.trim(),
+          singleOrder: null,
+          orders: res.orders,
+        }));
       }
     } catch {
       setNotFound(true);
@@ -58,8 +85,20 @@ export default function OrderStatusPage() {
     }
   };
 
-  const handleSelectOrder = (order: any) => setSingleOrder(order);
-  const handleBackToList = () => setSingleOrder(null);
+  const handleSelectOrder = (order: any) => {
+    setSingleOrder(order);
+    const prev = JSON.parse(sessionStorage.getItem(STATUS_KEY) || "null");
+    if (prev) {
+      sessionStorage.setItem(STATUS_KEY, JSON.stringify({ ...prev, singleOrder: order }));
+    }
+  };
+  const handleBackToList = () => {
+    setSingleOrder(null);
+    const prev = JSON.parse(sessionStorage.getItem(STATUS_KEY) || "null");
+    if (prev) {
+      sessionStorage.setItem(STATUS_KEY, JSON.stringify({ ...prev, singleOrder: null }));
+    }
+  };
 
   return (
     <div className="container mt-5 mb-5">
