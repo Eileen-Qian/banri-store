@@ -1,16 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslations, useLocale } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
-  api,
+  fetcher,
   localizedName,
   primaryImageUrl,
   ikTransform,
   priceRange,
 } from "@/utils/api";
+import useSWR from "swr";
 import { currency } from "@/utils/currency";
 import { emailValidation } from "@/utils/validation";
 
@@ -123,7 +124,6 @@ function StorySection() {
         <div className="row align-items-center g-5" ref={ref}>
           <div className={`col-lg-6 reveal ${visible ? "is-visible" : ""}`}>
             <div className="home-story__img-wrap">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/images/story-bg.jpg" alt="Brand story" />
             </div>
           </div>
@@ -183,7 +183,6 @@ function SubscriptionSection() {
               }
             >
               <div className="home-subs__item__img">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={img} alt={t(`home.subs.${id}.title`)} />
               </div>
               <div className="home-subs__item__body">
@@ -215,15 +214,8 @@ function FeaturedSection() {
   const t = useTranslations();
   const router = useRouter();
   const [ref, visible] = useReveal();
-  const [products, setProducts] = useState<any[]>([]);
-
-  useEffect(() => {
-    api
-      .get("api/v1/products?page=1")
-      .json<any>()
-      .then((res) => setProducts((res.items ?? []).slice(0, 4)))
-      .catch(() => {});
-  }, []);
+  const { data } = useSWR("api/v1/products?page=1", fetcher);
+  const products = (data as any)?.items?.slice(0, 4) ?? [];
 
   if (products.length === 0) return null;
 
@@ -255,7 +247,6 @@ function FeaturedSection() {
                   onClick={() => router.push(`/product/${p.id}`)}
                 >
                   {imgUrl && (
-                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={ikTransform(imgUrl, "w-600,h-450,cm-extract")}
                       alt={localizedName(p.name)}

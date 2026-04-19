@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import useSWR from "swr";
 import {
   api,
+  fetcher,
   localizedName,
   primaryImageUrl,
   priceRange,
@@ -15,32 +17,28 @@ import { useMessage } from "@/hooks/useMessage";
 
 
 export default function SingleProductPage() {
-  const [product, setProduct] = useState<any>(null);
-  const [mainImage, setMainImage] = useState("");
-  const [selectedVariant, setSelectedVariant] = useState<any>(null);
-  const [qty, setQty] = useState(1);
   const params = useParams<{ id: string }>();
   const t = useTranslations();
   const { showSuccess, showError } = useMessage();
 
-  useEffect(() => {
-    api
-      .get(`api/v1/products/${params.id}`)
-      .json<any>()
-      .then((res) => {
-        const data = res;
-        setProduct(data);
-        setMainImage(primaryImageUrl(data.images));
-        if (data.variants?.length > 0) setSelectedVariant(data.variants[0]);
-      })
-      .catch((err: any) => showError(err.message));
-  }, [params.id, showError]);
+  const { data: product } = useSWR(`api/v1/products/${params.id}`, fetcher);
+  const p = product as any;
+
+  const defaultImage = useMemo(() => p ? primaryImageUrl(p.images) : "", [p]);
+  const defaultVariant = useMemo(() => p?.variants?.[0] ?? null, [p]);
+
+  const [mainImage, setMainImage] = useState("");
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const [qty, setQty] = useState(1);
+
+  const activeImage = mainImage || defaultImage;
+  const activeVariant = selectedVariant || defaultVariant;
 
   const addCart = async () => {
-    if (!selectedVariant) return;
+    if (!activeVariant) return;
     try {
       await api.post("api/v1/cart/items", {
-        json: { variantId: selectedVariant.id, qty },
+        json: { variantId: activeVariant.id, qty },
         headers: cartHeaders(),
       });
       showSuccess(t("api.addCartSuccess"));
@@ -94,18 +92,17 @@ export default function SingleProductPage() {
     );
   }
 
-  const allImages = product.images || [];
-  const range = priceRange(product.variants);
+  const allImages = p.images || [];
+  const range = priceRange(p.variants);
 
   return (
     <div className="container mt-5 mb-3">
       <div className="row">
         <div className="col-md-6">
-          {mainImage && (
-            /* eslint-disable-next-line @next/next/no-img-element */
+          {activeImage && (
             <img
-              src={mainImage}
-              alt={localizedName(product.name)}
+              src={activeImage}
+              alt={localizedName(p.name)}
               className="img-fluid mb-3"
               style={{ width: "100%", height: "400px", objectFit: "cover" }}
             />
@@ -113,18 +110,17 @@ export default function SingleProductPage() {
           {allImages.length > 1 && (
             <div className="d-flex gap-2 flex-wrap">
               {allImages.map((img: any) => (
-                /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   key={img.id}
                   src={img.url}
-                  alt={localizedName(product.name)}
+                  alt={localizedName(p.name)}
                   style={{
                     width: "80px",
                     height: "80px",
                     objectFit: "cover",
                     cursor: "pointer",
                     border:
-                      mainImage === img.url
+                      activeImage === img.url
                         ? "2px solid var(--bs-primary)"
                         : "2px solid transparent",
                   }}
@@ -136,31 +132,31 @@ export default function SingleProductPage() {
         </div>
 
         <div className="col-md-6 text-start">
-          {product.category && (
+          {p.category && (
             <span className="badge bg-primary mb-2">
-              {localizedName(product.category.name)}
+              {localizedName(p.category.name)}
             </span>
           )}
-          <h2>{localizedName(product.name)}</h2>
-          {product.scientificName && (
-            <p className="text-muted fst-italic">{product.scientificName}</p>
+          <h2>{localizedName(p.name)}</h2>
+          {p.scientificName && (
+            <p className="text-muted fst-italic">{p.scientificName}</p>
           )}
-          {product.description && (
+          {p.description && (
             <p style={{ whiteSpace: "pre-line" }}>
-              {localizedName(product.description)}
+              {localizedName(p.description)}
             </p>
           )}
 
-          {product.variants?.length > 0 && (
+          {p.variants?.length > 0 && (
             <div className="mb-3">
               <label className="form-label fw-bold">{t("common.size")}</label>
               <div className="d-flex gap-2 flex-wrap">
-                {product.variants.map((v: any) => (
+                {p.variants.map((v: any) => (
                   <button
                     key={v.id}
                     type="button"
                     className={`btn btn-sm ${
-                      selectedVariant?.id === v.id
+                      activeVariant?.id === v.id
                         ? "btn-primary"
                         : "btn-outline-primary"
                     }`}
@@ -180,7 +176,7 @@ export default function SingleProductPage() {
             <span className="fs-4 fw-bold text-danger">
               NT${" "}
               {currency(
-                selectedVariant ? Number(selectedVariant.price) : range.min,
+                activeVariant ? Number(activeVariant.price) : range.min,
               )}
             </span>
           </div>

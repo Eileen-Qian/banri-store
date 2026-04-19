@@ -1,41 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import useSWR from "swr";
 import { api, localizedName, primaryImageUrl, cartHeaders } from "@/utils/api";
 import { currency } from "@/utils/currency";
 import { useMessage } from "@/hooks/useMessage";
 
+const cartFetcher = () => api.get("api/v1/cart", { headers: cartHeaders() }).json();
 
 export default function CartPage() {
   const t = useTranslations();
   const { showSuccess, showError } = useMessage();
-  const [items, setItems] = useState<any[] | null>(null);
-  const [total, setTotal] = useState("0");
+  const { data: cartData, mutate } = useSWR("cart", cartFetcher);
+  const items: any[] | null = (cartData as any)?.items ?? null;
+  const total = (cartData as any)?.total ?? "0";
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [isClearing, setIsClearing] = useState(false);
-
-  const fetchCart = async () => {
-    try {
-      const res: any = await api
-        .get("api/v1/cart", { headers: cartHeaders() })
-        .json();
-      setItems(res.items);
-      setTotal(res.total);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  const applyCartResponse = (data: any) => {
-    setItems(data.items);
-    setTotal(data.total);
-  };
 
   const updateQty = async (itemId: string, qty: number) => {
     setLoadingId(itemId);
@@ -46,7 +28,7 @@ export default function CartPage() {
           headers: cartHeaders(),
         })
         .json();
-      applyCartResponse(res);
+      mutate(res, { revalidate: false });
       showSuccess(t("api.updateCartSuccess"));
     } catch (err: any) {
       showError(err.message);
@@ -61,7 +43,7 @@ export default function CartPage() {
       const res: any = await api
         .delete(`api/v1/cart/items/${itemId}`, { headers: cartHeaders() })
         .json();
-      applyCartResponse(res);
+      mutate(res, { revalidate: false });
       showSuccess(t("api.removeCartSuccess"));
     } catch (err: any) {
       showError(err.message);
@@ -76,7 +58,7 @@ export default function CartPage() {
       const res: any = await api
         .delete("api/v1/cart", { headers: cartHeaders() })
         .json();
-      applyCartResponse(res);
+      mutate(res, { revalidate: false });
       showSuccess(t("api.clearCartSuccess"));
     } catch (err: any) {
       showError(err.message);
@@ -142,7 +124,6 @@ export default function CartPage() {
                 <tr key={item.id}>
                   <td>
                     {imgUrl && (
-                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={imgUrl}
                         alt={localizedName(v.product?.name)}
@@ -213,7 +194,6 @@ export default function CartPage() {
           return (
             <div key={item.id} className="d-flex gap-3 py-3 border-bottom">
               {imgUrl && (
-                /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={imgUrl}
                   alt={localizedName(v.product?.name)}

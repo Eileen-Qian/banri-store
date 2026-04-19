@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import useSWR from "swr";
 import {
-  api,
+  fetcher,
   localizedName,
   primaryImageUrl,
   ikTransform,
@@ -41,45 +42,21 @@ function ProductSkeleton() {
 export default function ProductsPage() {
   const router = useRouter();
   const t = useTranslations();
-  const [products, setProducts] = useState<any[]>([]);
-  const [pagination, setPagination] = useState({ page: 1, totalPages: 1 });
-  const [categories, setCategories] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
   const [currentCategory, setCurrentCategory] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
 
-  const fetchProducts = useCallback(
-    async (page = 1, categoryId = "") => {
-      const params = new URLSearchParams({ page: String(page) });
-      if (categoryId) params.set("categoryId", categoryId);
+  const params = new URLSearchParams({ page: String(page) });
+  if (currentCategory) params.set("categoryId", currentCategory);
+  const swrKey = `api/v1/products?${params}`;
 
-      const res: any = await api
-        .get(`api/v1/products?${params}`)
-        .json();
-      setProducts(res.items);
-      setPagination(res.pagination);
-      if (res.categories) setCategories(res.categories);
-    },
-    [],
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        await fetchProducts();
-      } catch (err) {
-        console.error(err);
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [fetchProducts]);
+  const { data, isLoading } = useSWR(swrKey, fetcher, { keepPreviousData: true });
+  const products: any[] = (data as any)?.items ?? [];
+  const pagination = (data as any)?.pagination ?? { page: 1, totalPages: 1 };
+  const categories: any[] = (data as any)?.categories ?? [];
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const categoryId = e.target.value;
-    setCurrentCategory(categoryId);
-    fetchProducts(1, categoryId);
+    setCurrentCategory(e.target.value);
+    setPage(1);
   };
 
   return (
@@ -122,7 +99,6 @@ export default function ProductsPage() {
               >
                 <div className="product-card__img-wrap">
                   {imgUrl ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={ikTransform(imgUrl, "w-600,h-450,cm-extract")}
                       className="product-card__img"
@@ -172,7 +148,7 @@ export default function ProductsPage() {
       <div className="mt-4">
         <Pagination
           pagination={pagination}
-          onChangePage={(page) => fetchProducts(page, currentCategory)}
+          onChangePage={(p) => setPage(p)}
         />
       </div>
     </div>

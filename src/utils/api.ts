@@ -7,6 +7,9 @@ export const api = ky.create({
   prefixUrl: API_BASE,
 });
 
+/** SWR fetcher using ky */
+export const fetcher = (url: string) => api.get(url).json();
+
 // ── Cart token management ───────────────────────────────────────────────────
 
 const CART_TOKEN_KEY = "banri-cart-token";

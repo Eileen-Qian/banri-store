@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import useSWR from "swr";
 import { Link } from "@/i18n/navigation";
-import { api, localizedName } from "@/utils/api";
+import { api, fetcher, localizedName } from "@/utils/api";
 import { currency } from "@/utils/currency";
 import { getLineLoginUrl, exchangeLineCode } from "@/utils/lineLogin";
 
@@ -14,32 +15,31 @@ export default function OrderSuccessPage() {
   const t = useTranslations();
 
   // Try sessionStorage first (from checkout), then API
-  const [order, setOrder] = useState<any>(() => {
-    if (typeof window === "undefined") return null;
-    const stored = sessionStorage.getItem(`banri-order-${params.id}`);
-    if (stored) {
-      sessionStorage.removeItem(`banri-order-${params.id}`);
-      return JSON.parse(stored);
-    }
-    return null;
-  });
-  const [loading, setLoading] = useState(!order);
-  const [error, setError] = useState("");
+  // Try sessionStorage first (from checkout), then SWR fetch
+  const initialOrder = typeof window !== "undefined"
+    ? (() => {
+        const stored = sessionStorage.getItem(`banri-order-${params.id}`);
+        if (stored) {
+          sessionStorage.removeItem(`banri-order-${params.id}`);
+          return JSON.parse(stored);
+        }
+        return undefined;
+      })()
+    : undefined;
+
+  const { data: orderData, error: fetchError, isLoading: loading } = useSWR(
+    `api/v1/orders/${params.id}`,
+    fetcher,
+    { fallbackData: initialOrder },
+  );
+  const order = orderData as any;
+  const error = fetchError?.message ?? "";
+
   const [lineLinked, setLineLinked] = useState(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem(`banri-line-linked-${params.id}`) === "1";
   });
   const [linkingLine, setLinkingLine] = useState(false);
-
-  useEffect(() => {
-    if (order) return;
-    api
-      .get(`api/v1/orders/${params.id}`)
-      .json<any>()
-      .then((res) => setOrder(res))
-      .catch((err: any) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [params.id, order]);
 
   // LINE Login callback — run once on mount
   const fromLineLogin = useRef(false);

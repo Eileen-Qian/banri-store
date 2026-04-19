@@ -1,30 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { api, localizedName } from "@/utils/api";
+import useSWR from "swr";
+import { fetcher, localizedName } from "@/utils/api";
 import { currency } from "@/utils/currency";
 
 
 export default function ShippingPage() {
   const t = useTranslations();
   const locale = useLocale();
-  const [rates, setRates] = useState<any[]>([]);
   const [filterCity, setFilterCity] = useState("");
-  const [shippingInfo, setShippingInfo] = useState<any>(null);
 
-  useEffect(() => {
-    api
-      .get("api/v1/shipping/rates")
-      .json<any>()
-      .then((res) => setRates(res.rates))
-      .catch(console.error);
-    api
-      .get("api/v1/shipping/info")
-      .json<any>()
-      .then((res) => setShippingInfo(res))
-      .catch(console.error);
-  }, []);
+  const { data: ratesData } = useSWR("api/v1/shipping/rates", fetcher);
+  const { data: shippingInfoData } = useSWR("api/v1/shipping/info", fetcher);
+  const shippingInfo = shippingInfoData as any;
+  const rates: any[] = useMemo(() => (ratesData as any)?.rates ?? [], [ratesData]);
 
   const cities = useMemo(() => {
     const seen = new Map<string, any>();
@@ -71,7 +62,6 @@ export default function ShippingPage() {
             <li>{t("shipping.rule3")}</li>
           </ul>
 
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={convenienceImg}
             alt={t("shipping.convenienceBoxAlt")}

@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslations, useLocale } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
+import useSWR from "swr";
 import {
   api,
+  fetcher,
   localizedName,
   primaryImageUrl,
   cartHeaders,
@@ -92,12 +94,26 @@ export default function CheckOutPage() {
   const router = useRouter();
   const t = useTranslations();
   const locale = useLocale();
-  const [items, setItems] = useState<any[] | null>(null);
-  const [total, setTotal] = useState("0");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showError } = useMessage();
 
-  const [methods, setMethods] = useState<any[]>([]);
+  const cartFetcher = () => api.get("api/v1/cart", { headers: cartHeaders() }).json();
+  const methodsFetcher = () => api.get("api/v1/shipping/methods", { headers: cartHeaders() }).json();
+
+  const { data: cartData } = useSWR("checkout-cart", cartFetcher);
+  const { data: methodsData } = useSWR("shipping-methods", methodsFetcher);
+  const { data: chainsData } = useSWR("api/v1/shipping/store-chains", fetcher);
+  const { data: regionsData } = useSWR("api/v1/shipping/regions", fetcher);
+
+  const items = (cartData as any)?.items ?? null;
+  const total = (cartData as any)?.total ?? "0";
+  const methods: any[] = useMemo(() => (methodsData as any)?.methods ?? [], [methodsData]);
+  const minAmountPrivate = (methodsData as any)?.minAmountPrivate ?? "0";
+  const storeChains: any[] = (chainsData as any)?.chains ?? [];
+  const regions: any = useMemo(() => regionsData ?? { privateDelivery: [] }, [regionsData]);
+  const [districts, setDistricts] = useState<any[]>([]);
+
   const [selectedMethod, setSelectedMethodRaw] = useState(
     getSavedDeliveryMethod,
   );
@@ -105,58 +121,17 @@ export default function CheckOutPage() {
     setSelectedMethodRaw(id);
     saveDeliveryMethod(id);
   };
-  const [regions, setRegions] = useState<any>({ privateDelivery: [] });
-  const [districts, setDistricts] = useState<any[]>([]);
-  const [minAmountPrivate, setMinAmountPrivate] = useState("0");
-  const [storeChains, setStoreChains] = useState<any[]>([]);
 
-  useEffect(() => {
-    api
-      .get("api/v1/cart", { headers: cartHeaders() })
-      .json<any>()
-      .then((res) => {
-        setItems(res.items);
-        setTotal(res.total);
-      })
-      .catch((err: any) => showError(err.message));
-  }, [showError]);
-
-  useEffect(() => {
-    api
-      .get("api/v1/shipping/methods", { headers: cartHeaders() })
-      .json<any>()
-      .then((res) => {
-        setMethods(res.methods);
-        setMinAmountPrivate(res.minAmountPrivate);
-      })
-      .catch(console.error);
-  }, []);
-
+  const selectedMethodRef = useRef(selectedMethod);
+  selectedMethodRef.current = selectedMethod;
   useEffect(() => {
     if (methods.length === 0) return;
-    const current = methods.find((m: any) => m.id === selectedMethod);
+    const current = methods.find((m: any) => m.id === selectedMethodRef.current);
     if (current && !current.available) {
       const fallback = methods.find((m: any) => m.available);
       setSelectedMethod(fallback ? fallback.id : "");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [methods]);
-
-  useEffect(() => {
-    api
-      .get("api/v1/shipping/store-chains")
-      .json<any>()
-      .then((res) => setStoreChains(res.chains))
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    api
-      .get("api/v1/shipping/regions")
-      .json<any>()
-      .then((res) => setRegions(res))
-      .catch(console.error);
-  }, []);
 
   // Restore form data from sessionStorage (survives language switch)
   const FORM_KEY = "banri-checkout-form";
@@ -410,7 +385,6 @@ export default function CheckOutPage() {
                 <tr key={item.id}>
                   <td>
                     {imgUrl && (
-                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={imgUrl}
                         alt={localizedName(v.product?.name)}

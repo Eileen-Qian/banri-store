@@ -19,7 +19,7 @@ export default async function LocaleLayout({
   }
 
   const messages = (
-    await import(`@/i18n/locales/${locale === "zh" ? "zh-TW" : "en"}.json`)
+    await import(`@/i18n/locales/${locale}.json`)
   ).default;
 
   return (
