@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useTranslations, useLocale } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
+  api,
   fetcher,
   localizedName,
   primaryImageUrl,
@@ -310,6 +311,8 @@ function ContactSection() {
   const locale = useLocale();
   const [ref, visible] = useReveal();
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState(false);
 
   const {
     register,
@@ -360,7 +363,18 @@ function ContactSection() {
             ) : (
               <form
                 className="home-contact__form"
-                onSubmit={handleSubmit(() => setSubmitted(true))}
+                onSubmit={handleSubmit(async (data) => {
+                  setSending(true);
+                  setSendError(false);
+                  try {
+                    await api.post("api/v1/contact", { json: data });
+                    setSubmitted(true);
+                  } catch {
+                    setSendError(true);
+                  } finally {
+                    setSending(false);
+                  }
+                })}
                 noValidate
               >
                 <div className="home-contact__field">
@@ -421,11 +435,20 @@ function ContactSection() {
                   )}
                 </div>
 
+                {sendError && (
+                  <p className="home-contact__err" role="alert">
+                    {t("home.contact.sendError")}
+                  </p>
+                )}
+
                 <button
                   type="submit"
                   className="btn btn-primary home-contact__submit w-100"
+                  disabled={sending}
                 >
-                  {t("home.contact.submit")}
+                  {sending
+                    ? t("home.contact.sending")
+                    : t("home.contact.submit")}
                 </button>
 
                 <div className="home-contact__divider">

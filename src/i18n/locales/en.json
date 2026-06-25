@@ -205,7 +205,9 @@
       "successTitle": "Message Sent!",
       "successDesc": "Thank you for reaching out. We'll get back to you within 1–2 business days.",
       "nameRequired": "Name is required",
-      "messageRequired": "Message is required"
+      "messageRequired": "Message is required",
+      "sendError": "Failed to send. Please try again later.",
+      "sending": "Sending..."
     }
   },
   "notFound": {
