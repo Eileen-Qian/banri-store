@@ -46,7 +46,16 @@
     "selfPickupNote": "自取免運費，請至伴日門市取貨",
     "free": "免運費",
     "orderSummary": "訂單摘要",
-    "shippingCalcHint": "運費將於訂單確認後另行通知"
+    "shippingCalcHint": "運費以 IG 私訊告知為準",
+    "igNotice": "此頁面僅為品項試算，非正式訂單",
+    "igNoticeDesc": "確認品項後，請點下方按鈕複製清單並私訊 IG 下單",
+    "dmOnIG": "私訊 IG 下單",
+    "panelTitle": "送出訂購詢問",
+    "panelDesc": "請先複製以下品項清單，再點「前往 IG 私訊」貼上內容送出即可",
+    "copyBtn": "複製品項清單",
+    "copied": "已複製！",
+    "copyFallback": "自動複製失敗，請長按選取手動複製",
+    "openIG": "前往 IG 私訊"
   },
   "orderSuccess": {
     "title": "訂單已送出！",

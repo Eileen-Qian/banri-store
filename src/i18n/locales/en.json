@@ -46,7 +46,16 @@
     "selfPickupNote": "Free — pick up at Banri store",
     "free": "Free",
     "orderSummary": "Order Summary",
-    "shippingCalcHint": "Shipping fees will be confirmed after order review"
+    "shippingCalcHint": "Shipping fee will be confirmed via IG DM",
+    "igNotice": "This page is for price estimation only",
+    "igNoticeDesc": "After reviewing your items, tap the button below to copy the list and DM us on IG to place your order",
+    "dmOnIG": "Order via IG DM",
+    "panelTitle": "Send Order Inquiry",
+    "panelDesc": "Copy the item list below, then tap \"Open IG DM\" and paste it to place your order",
+    "copyBtn": "Copy Item List",
+    "copied": "Copied!",
+    "copyFallback": "Auto-copy failed — please long-press to select and copy manually",
+    "openIG": "Open IG DM"
   },
   "orderSuccess": {
     "title": "Order Placed!",
