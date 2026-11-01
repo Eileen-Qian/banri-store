@@ -74,17 +74,17 @@ export default function Navbar() {
                 {t("nav.shipping")}
               </Link>
             </li>
-            <li className="nav-item">
-              <Link
-                className="nav-link"
-                href="/order-status"
-                onClick={closeMenu}
-              >
-                {t("nav.orderStatus")}
-              </Link>
-            </li>
           </ul>
-          <div className="d-none d-lg-flex align-items-center gap-1">
+          <div className="d-none d-lg-flex align-items-center gap-2">
+            <a
+              href="https://www.instagram.com/always.plants.banri"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm btn-outline-primary"
+              aria-label="Instagram"
+            >
+              <i className="bi bi-instagram" />
+            </a>
             <DarkModeToggle />
             <LanguageSwitcher />
           </div>

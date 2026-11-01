@@ -20,6 +20,7 @@ import {
 } from "@/utils/api";
 import { currency } from "@/utils/currency";
 import { useMessage } from "@/hooks/useMessage";
+import { useAuth } from "@/hooks/useAuth";
 import {
   emailValidation,
   taiwanPhoneValidation,
@@ -97,6 +98,7 @@ export default function CheckOutPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showError } = useMessage();
+  const { customer, token } = useAuth();
 
   const cartFetcher = () => api.get("api/v1/cart", { headers: cartHeaders() }).json();
   const methodsFetcher = () => api.get("api/v1/shipping/methods", { headers: cartHeaders() }).json();
@@ -151,6 +153,15 @@ export default function CheckOutPage() {
     ? JSON.parse(sessionStorage.getItem(FORM_KEY) || "null")
     : null;
 
+  // Auto-fill from customer profile (if logged in and no saved form)
+  const autoFill = !savedForm && customer
+    ? {
+        email: customer.email ?? "",
+        name: customer.name ?? "",
+        tel: customer.phone ?? "",
+      }
+    : {};
+
   const {
     register,
     handleSubmit,
@@ -159,7 +170,7 @@ export default function CheckOutPage() {
     formState: { errors },
   } = useForm({
     mode: "onChange",
-    defaultValues: savedForm ?? defaultForm,
+    defaultValues: { ...defaultForm, ...savedForm, ...autoFill },
   });
 
   // Persist form data on every change (skip after order placed)
@@ -290,7 +301,10 @@ export default function CheckOutPage() {
             message: formData.message || undefined,
             locale,
           },
-          headers: cartHeaders(),
+          headers: {
+            ...cartHeaders(),
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
         })
         .json();
       clearCartToken();

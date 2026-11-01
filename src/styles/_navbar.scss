@@ -40,3 +40,19 @@
     transform: rotate(20deg) scale(1.15);
   }
 }
+
+// ── User dropdown (hover) ────────────────────────────────────────────────────
+
+.nav-user-dropdown {
+  position: relative;
+
+  .dropdown-menu {
+    min-width: 10rem;
+    margin-top: 0.25rem;
+  }
+
+  &:hover > .dropdown-menu,
+  &:focus-within > .dropdown-menu {
+    display: block;
+  }
+}
