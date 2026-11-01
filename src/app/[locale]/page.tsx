@@ -323,7 +323,8 @@ function ContactSection() {
     defaultValues: { name: "", email: "", message: "" },
   });
 
-  const mapSrc = `${MAP_SRC_BASE}&hl=${locale}`;
+  // Google treats bare `zh` as Simplified Chinese; must pass zh-TW
+  const mapSrc = `${MAP_SRC_BASE}&hl=${locale === "zh" ? "zh-TW" : locale}`;
 
   return (
     <section className="home-contact">
