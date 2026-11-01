@@ -18,7 +18,13 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment Variables
+
+| Key | 說明 |
+|-----|------|
+| `NEXT_PUBLIC_API_BASE` | banri-api base URL |
+| `NEXT_PUBLIC_LINE_LOGIN_CHANNEL_ID` | LINE Login channel ID |
+| `CHECKOUT_ENABLED` | 設為 `true` 才開放線上下單頁（checkout / order-success / order-status / line-callback）與運費說明頁 `/shipping`；未設定時導回 `/cart`，改用 IG 私訊下單。需同時開啟 banri-api 的 `ORDERS_ENABLED` |
 
 ## Learn More
 

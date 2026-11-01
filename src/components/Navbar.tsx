@@ -69,11 +69,6 @@ export default function Navbar() {
                 {t("nav.cart")}
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" href="/shipping" onClick={closeMenu}>
-                {t("nav.shipping")}
-              </Link>
-            </li>
           </ul>
           <div className="d-none d-lg-flex align-items-center gap-2">
             <a
