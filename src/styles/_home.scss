@@ -1,5 +1,9 @@
 // ── Home page ─────────────────────────────────────────────────────────────────
-$font-display: 'Playfair Display', Georgia, serif;
+// Headings share the body font (Noto Sans TC); hierarchy via weight + tracking
+@mixin font-display {
+  font-family: var(--bs-font-sans-serif);
+  letter-spacing: 0.02em;
+}
 
 // Scroll-reveal utility
 .reveal {
@@ -58,7 +62,7 @@ $font-display: 'Playfair Display', Georgia, serif;
   }
 
   &__title {
-    font-family: $font-display;
+    @include font-display;
     font-size: clamp(2.5rem, 6vw, 4.5rem);
     font-weight: 700;
     line-height: 1.15;
@@ -128,7 +132,7 @@ $font-display: 'Playfair Display', Georgia, serif;
   }
 
   &__heading {
-    font-family: $font-display;
+    @include font-display;
     font-size: clamp(1.6rem, 3.5vw, 2.25rem);
     font-weight: 700;
     margin-bottom: 3rem;
@@ -203,7 +207,7 @@ $font-display: 'Playfair Display', Georgia, serif;
   }
 
   &__title {
-    font-family: $font-display;
+    @include font-display;
     font-size: clamp(1.75rem, 4vw, 2.75rem);
     font-weight: 700;
     line-height: 1.2;
@@ -231,7 +235,7 @@ $font-display: 'Playfair Display', Georgia, serif;
   }
 
   &__heading {
-    font-family: $font-display;
+    @include font-display;
     font-size: clamp(1.6rem, 3.5vw, 2.25rem);
     font-weight: 700;
     margin-bottom: 3rem;
@@ -318,7 +322,7 @@ $font-display: 'Playfair Display', Georgia, serif;
   }
 
   &__heading {
-    font-family: $font-display;
+    @include font-display;
     font-size: clamp(1.6rem, 3.5vw, 2.25rem);
     font-weight: 700;
     margin-bottom: 3rem;
@@ -381,7 +385,7 @@ $font-display: 'Playfair Display', Georgia, serif;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 
       h3 {
-        font-family: $font-display;
+        @include font-display;
         font-size: 1.35rem;
         font-weight: 700;
         color: darken($primary, 15%);
@@ -531,7 +535,7 @@ $font-display: 'Playfair Display', Georgia, serif;
   }
 
   &__heading {
-    font-family: $font-display;
+    @include font-display;
     font-size: clamp(1.5rem, 3vw, 2.1rem);
     font-weight: 700;
     text-align: center;
@@ -662,7 +666,7 @@ $font-display: 'Playfair Display', Georgia, serif;
     }
 
     h3 {
-      font-family: $font-display;
+      @include font-display;
       font-size: 1.5rem;
       font-weight: 700;
       color: darken($primary, 8%);

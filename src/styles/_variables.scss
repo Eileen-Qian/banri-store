@@ -8,3 +8,6 @@ $green:   #6B7B59 !default;
 $teal:    #6B9B84 !default;
 
 $primary: #6B7B59 !default;
+
+// Noto Sans TC loaded via next/font (src/app/layout.tsx); OS fonts as fallback
+$font-family-sans-serif: var(--font-noto-sans-tc), system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif !default;
